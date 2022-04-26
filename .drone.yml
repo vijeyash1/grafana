@@ -7,20 +7,6 @@ platform:
   os: linux
 services: []
 steps:
-- image: meltwater/drone-cache:v1.2.2
-  name: restore-cache
-  pull: always
-  settings:
-    backend: gcs
-    bucket: test-julien
-    cache_key: test123
-    json_key:
-      from_secret: tf_google_credentials
-    mount:
-    - yarncache
-    - node_modules
-    - .betterer.cache
-    restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
   image: alpine:3.15
@@ -38,13 +24,8 @@ steps:
   image: grafana/build-container:1.5.4
   name: gen-version
 - commands:
-  - make gen-go
-  image: grafana/build-container:1.5.4
-  name: wire-install
-- commands:
   - yarn install --immutable
   depends_on:
-  - restore-cache
   - grabpl
   environment:
     YARN_CACHE_FOLDER: /drone/src/yarncache
@@ -96,20 +77,6 @@ platform:
   os: linux
 services: []
 steps:
-- image: meltwater/drone-cache:v1.2.2
-  name: restore-cache
-  pull: always
-  settings:
-    backend: gcs
-    bucket: test-julien
-    cache_key: test123
-    json_key:
-      from_secret: tf_google_credentials
-    mount:
-    - yarncache
-    - node_modules
-    - .betterer.cache
-    restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
   image: alpine:3.15
@@ -127,26 +94,13 @@ steps:
   image: grafana/build-container:1.5.4
   name: gen-version
 - commands:
-  - make gen-go
-  image: grafana/build-container:1.5.4
-  name: wire-install
-- commands:
   - yarn install --immutable
   depends_on:
-  - restore-cache
   - grabpl
   environment:
     YARN_CACHE_FOLDER: /drone/src/yarncache
   image: grafana/build-container:1.5.4
   name: yarn-install
-- commands:
-  - ./bin/grabpl build-backend --jobs 8 --edition oss --build-id ${DRONE_BUILD_NUMBER}
-    --variants linux-amd64,linux-amd64-musl,darwin-amd64,windows-amd64,armv6
-  depends_on:
-  - gen-version
-  - wire-install
-  image: grafana/build-container:1.5.4
-  name: build-backend
 - commands:
   - ./bin/grabpl build-frontend --jobs 8 --edition oss --build-id ${DRONE_BUILD_NUMBER}
   depends_on:
@@ -166,187 +120,6 @@ steps:
     NODE_OPTIONS: --max_old_space_size=8192
   image: grafana/build-container:1.5.4
   name: build-frontend-packages
-- depends_on:
-  - build-frontend
-  - build-frontend-packages
-  - yarn-install
-  image: meltwater/drone-cache:v1.2.2
-  name: rebuild-cache
-  pull: always
-  settings:
-    backend: gcs
-    bucket: test-julien
-    cache_key: test123
-    json_key:
-      from_secret: tf_google_credentials
-    mount:
-    - yarncache
-    - node_modules
-    - .betterer.cache
-    rebuild: "true"
-  when:
-    event: pull_request
-- commands:
-  - ./bin/grabpl build-plugins --jobs 8 --edition oss
-  depends_on:
-  - gen-version
-  - yarn-install
-  environment: null
-  image: grafana/build-container:1.5.4
-  name: build-plugins
-- commands:
-  - ./bin/linux-amd64/grafana-cli cue validate-schema --grafana-root .
-  depends_on:
-  - build-backend
-  image: grafana/build-container:1.5.4
-  name: validate-scuemata
-- commands:
-  - '# It is required that the generated Typescript be in sync with the input CUE
-    files.'
-  - '# To enforce this, the following command will attempt to generate Typescript
-    from all'
-  - '# appropriate .cue files, then compare with the corresponding (*.gen.ts) file
-    the generated'
-  - '# code would have been written to. It exits 1 if any diffs are found.'
-  - ./bin/linux-amd64/grafana-cli cue gen-ts --grafana-root . --diff
-  depends_on:
-  - validate-scuemata
-  image: grafana/build-container:1.5.4
-  name: ensure-cuetsified
-- commands:
-  - . scripts/build/gpg-test-vars.sh && ./bin/grabpl package --jobs 8 --edition oss
-    --build-id ${DRONE_BUILD_NUMBER} --variants linux-amd64,linux-amd64-musl,darwin-amd64,windows-amd64,armv6
-  depends_on:
-  - build-plugins
-  - build-backend
-  - build-frontend
-  - build-frontend-packages
-  environment: null
-  image: grafana/build-container:1.5.4
-  name: package
-- commands:
-  - ./scripts/grafana-server/start-server
-  depends_on:
-  - build-plugins
-  - build-backend
-  - build-frontend
-  - build-frontend-packages
-  detach: true
-  environment:
-    ARCH: linux-amd64
-    PORT: 3001
-  image: grafana/build-container:1.5.4
-  name: grafana-server
-- commands:
-  - apt-get install -y netcat
-  - ./bin/grabpl e2e-tests --port 3001 --suite dashboards-suite
-  depends_on:
-  - grafana-server
-  environment:
-    HOST: grafana-server
-  image: cypress/included:9.5.1-node16.14.0-slim-chrome99-ff97
-  name: end-to-end-tests-dashboards-suite
-- commands:
-  - apt-get install -y netcat
-  - ./bin/grabpl e2e-tests --port 3001 --suite smoke-tests-suite
-  depends_on:
-  - grafana-server
-  environment:
-    HOST: grafana-server
-  image: cypress/included:9.5.1-node16.14.0-slim-chrome99-ff97
-  name: end-to-end-tests-smoke-tests-suite
-- commands:
-  - apt-get install -y netcat
-  - ./bin/grabpl e2e-tests --port 3001 --suite panels-suite
-  depends_on:
-  - grafana-server
-  environment:
-    HOST: grafana-server
-  image: cypress/included:9.5.1-node16.14.0-slim-chrome99-ff97
-  name: end-to-end-tests-panels-suite
-- commands:
-  - apt-get install -y netcat
-  - ./bin/grabpl e2e-tests --port 3001 --suite various-suite
-  depends_on:
-  - grafana-server
-  environment:
-    HOST: grafana-server
-  image: cypress/included:9.5.1-node16.14.0-slim-chrome99-ff97
-  name: end-to-end-tests-various-suite
-- commands:
-  - apt-get update
-  - apt-get install -yq zip
-  - ls -lah ./e2e
-  - find ./e2e -type f -name "*.mp4"
-  - printenv GCP_GRAFANA_UPLOAD_ARTIFACTS_KEY > /tmp/gcpkey_upload_artifacts.json
-  - gcloud auth activate-service-account --key-file=/tmp/gcpkey_upload_artifacts.json
-  - find ./e2e -type f -name "*spec.ts.mp4" | zip e2e/videos.zip -@
-  - gsutil cp e2e/videos.zip gs://$${E2E_TEST_ARTIFACTS_BUCKET}/${DRONE_BUILD_NUMBER}/artifacts/videos/videos.zip
-  - export E2E_ARTIFACTS_VIDEO_ZIP=https://storage.googleapis.com/$${E2E_TEST_ARTIFACTS_BUCKET}/${DRONE_BUILD_NUMBER}/artifacts/videos/videos.zip
-  - 'echo "E2E Test artifacts uploaded to: $${E2E_ARTIFACTS_VIDEO_ZIP}"'
-  - 'curl -X POST https://api.github.com/repos/${DRONE_REPO}/statuses/${DRONE_COMMIT_SHA}
-    -H "Authorization: token $${GITHUB_TOKEN}" -d "{\"state\":\"success\",\"target_url\":\"$${E2E_ARTIFACTS_VIDEO_ZIP}\",
-    \"description\": \"Click on the details to download e2e recording videos\", \"context\":
-    \"e2e_artifacts\"}"'
-  depends_on:
-  - end-to-end-tests-dashboards-suite
-  - end-to-end-tests-panels-suite
-  - end-to-end-tests-smoke-tests-suite
-  - end-to-end-tests-various-suite
-  environment:
-    E2E_TEST_ARTIFACTS_BUCKET: releng-pipeline-artifacts-dev
-    GCP_GRAFANA_UPLOAD_ARTIFACTS_KEY:
-      from_secret: gcp_upload_artifacts_key
-    GITHUB_TOKEN:
-      from_secret: github_token
-  image: google/cloud-sdk:367.0.0
-  name: e2e-tests-artifacts-upload
-  when:
-    status:
-    - success
-    - failure
-- commands:
-  - yarn storybook:build
-  - ./bin/grabpl verify-storybook
-  depends_on:
-  - build-frontend
-  - build-frontend-packages
-  environment:
-    NODE_OPTIONS: --max_old_space_size=4096
-  image: grafana/build-container:1.5.4
-  name: build-storybook
-- commands:
-  - yarn wait-on http://$HOST:$PORT
-  - pa11y-ci --config .pa11yci-pr.conf.js
-  depends_on:
-  - grafana-server
-  environment:
-    GRAFANA_MISC_STATS_API_KEY:
-      from_secret: grafana_misc_stats_api_key
-    HOST: grafana-server
-    PORT: 3001
-  failure: always
-  image: grafana/docker-puppeteer:1.0.0
-  name: test-a11y-frontend
-- commands:
-  - ls dist/*.tar.gz*
-  - cp dist/*.tar.gz* packaging/docker/
-  depends_on:
-  - package
-  image: grafana/build-container:1.5.4
-  name: copy-packages-for-docker
-- commands:
-  - ./bin/grabpl build-docker --edition oss -archs amd64
-  depends_on:
-  - copy-packages-for-docker
-  environment:
-    GCP_KEY:
-      from_secret: gcp_key
-  image: google/cloud-sdk
-  name: build-docker-images
-  volumes:
-  - name: docker
-    path: /var/run/docker.sock
 trigger:
   event:
   - pull_request
@@ -486,7 +259,6 @@ steps:
 - commands:
   - yarn install --immutable
   depends_on:
-  - restore-cache
   - grabpl
   environment:
     YARN_CACHE_FOLDER: /drone/src/yarncache
@@ -597,6 +369,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: 19bd8cc3d55acc21ed109566305797c30c08ffb123118b625d3e3a7cd7713e3c
+hmac: 9b16ff12b51aca3919e5abf7b327c37535a8489c1c3e0d4444f4003e525f211e
 
 ...
