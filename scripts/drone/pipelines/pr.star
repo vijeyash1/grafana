@@ -74,13 +74,6 @@ def pr_pipelines(edition):
         yarn_install_step(),
     ]
     test_steps = [
-        lint_drone_step(),
-        codespell_step(),
-        shellcheck_step(),
-        lint_backend_step(edition=edition),
-        lint_frontend_step(),
-        test_backend_step(edition=edition),
-        test_backend_integration_step(edition=edition),
         test_frontend_step(),
         rebuild_cache_step_betterer(),
     ]

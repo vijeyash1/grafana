@@ -51,61 +51,6 @@ steps:
   image: grafana/build-container:1.5.4
   name: yarn-install
 - commands:
-  - ./bin/grabpl verify-drone
-  depends_on:
-  - grabpl
-  image: byrnedo/alpine-curl:0.1.8
-  name: lint-drone
-- commands:
-  - |-
-    echo -e "unknwon
-    referer
-    errorstring
-    eror
-    iam
-    wan" > words_to_ignore.txt
-  - codespell -I words_to_ignore.txt docs/
-  - rm words_to_ignore.txt
-  image: grafana/build-container:1.5.4
-  name: codespell
-- commands:
-  - ./bin/grabpl shellcheck
-  depends_on:
-  - grabpl
-  image: grafana/build-container:1.5.4
-  name: shellcheck
-- commands:
-  - ./bin/grabpl lint-backend --edition oss
-  depends_on:
-  - wire-install
-  environment:
-    CGO_ENABLED: "1"
-  image: grafana/build-container:1.5.4
-  name: lint-backend
-- commands:
-  - yarn run prettier:check
-  - yarn run lint
-  - yarn run i18n:compile
-  - yarn run typecheck
-  depends_on:
-  - yarn-install
-  environment:
-    TEST_MAX_WORKERS: 50%
-  image: grafana/build-container:1.5.4
-  name: lint-frontend
-- commands:
-  - ./bin/grabpl test-backend --edition oss
-  depends_on:
-  - wire-install
-  image: grafana/build-container:1.5.4
-  name: test-backend
-- commands:
-  - ./bin/grabpl integration-tests --edition oss
-  depends_on:
-  - wire-install
-  image: grafana/build-container:1.5.4
-  name: test-backend-integration
-- commands:
   - yarn run ci:test-frontend
   depends_on:
   - yarn-install
@@ -651,6 +596,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: 87ea65c6194d1897f40164ff1dfb582d305add2e747b81f37a71f1d691b6f786
+hmac: c22f4bad737713c3619a57eeb58b27fe488e9c02597360e2b6915afec81bfe33
 
 ...
