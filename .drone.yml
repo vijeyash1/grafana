@@ -51,6 +51,7 @@ steps:
   image: grafana/build-container:1.5.4
   name: yarn-install
 - commands:
+  - ls -la node_modules/.cache/
   - yarn run ci:test-frontend
   depends_on:
   - yarn-install
@@ -596,6 +597,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: c22f4bad737713c3619a57eeb58b27fe488e9c02597360e2b6915afec81bfe33
+hmac: 19bd8cc3d55acc21ed109566305797c30c08ffb123118b625d3e3a7cd7713e3c
 
 ...
