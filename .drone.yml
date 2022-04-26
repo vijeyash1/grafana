@@ -41,7 +41,7 @@ steps:
   image: grafana/build-container:1.5.4
   name: wire-install
 - commands:
-  - ls -a yarncache
+  - if [ -d "yarncache" ]; then ls -a yarncache; fi
   - yarn install --immutable
   depends_on:
   - restore-cache
@@ -167,7 +167,7 @@ steps:
   image: grafana/build-container:1.5.4
   name: wire-install
 - commands:
-  - ls -a yarncache
+  - if [ -d "yarncache" ]; then ls -a yarncache; fi
   - yarn install --immutable
   depends_on:
   - restore-cache
@@ -517,7 +517,7 @@ steps:
   image: grafana/build-container:1.5.4
   name: gen-version
 - commands:
-  - ls -a yarncache
+  - if [ -d "yarncache" ]; then ls -a yarncache; fi
   - yarn install --immutable
   depends_on:
   - restore-cache
@@ -631,6 +631,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: 23f58a9458b067ffee9bd3efd33603b6c8e0a9da93cc6ebc86bef67df4d1dca1
+hmac: e9d4f85965031b48e9a0ffe1e8d6db3e53460d14261b8acd5de90719318d6ab2
 
 ...
