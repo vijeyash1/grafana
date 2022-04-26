@@ -19,6 +19,7 @@ steps:
     mount:
     - yarncache
     - node_modules
+    - .betterer.cache
     restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
@@ -109,9 +110,26 @@ steps:
   depends_on:
   - yarn-install
   environment:
+    BETTERER_CACHE: .betterer.cache
     TEST_MAX_WORKERS: 50%
   image: grafana/build-container:1.5.4
   name: test-frontend
+- depends_on:
+  - test-frontend
+  image: meltwater/drone-cache:v1.2.2
+  name: rebuild-cache
+  pull: always
+  settings:
+    backend: gcs
+    bucket: test-julien
+    cache_key: test123
+    json_key:
+      from_secret: tf_google_credentials
+    mount:
+    - .betterer.cache
+    rebuild: "true"
+  when:
+    event: pull_request
 trigger:
   event:
   - pull_request
@@ -144,6 +162,7 @@ steps:
     mount:
     - yarncache
     - node_modules
+    - .betterer.cache
     restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
@@ -217,6 +236,7 @@ steps:
     mount:
     - yarncache
     - node_modules
+    - .betterer.cache
     rebuild: "true"
   when:
     event: pull_request
@@ -499,6 +519,7 @@ steps:
     mount:
     - yarncache
     - node_modules
+    - .betterer.cache
     restore: "true"
 - commands:
   - mkdir -p bin
@@ -630,6 +651,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: ea4cd9420063f2707a7d198884a7ec51fd7b099aa9c5c2b0ab0e761a2bbc3486
+hmac: 87ea65c6194d1897f40164ff1dfb582d305add2e747b81f37a71f1d691b6f786
 
 ...

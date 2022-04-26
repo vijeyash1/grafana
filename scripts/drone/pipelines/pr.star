@@ -15,6 +15,7 @@ load(
     'build_frontend_step',
     'build_frontend_package_step',
     'rebuild_cache_step',
+    'rebuild_cache_step_betterer',
     'build_plugins_step',
     'test_backend_step',
     'test_backend_integration_step',
@@ -81,6 +82,7 @@ def pr_pipelines(edition):
         test_backend_step(edition=edition),
         test_backend_integration_step(edition=edition),
         test_frontend_step(),
+        rebuild_cache_step_betterer(),
     ]
     build_steps = [
         build_backend_step(edition=edition, ver_mode=ver_mode, variants=variants),
