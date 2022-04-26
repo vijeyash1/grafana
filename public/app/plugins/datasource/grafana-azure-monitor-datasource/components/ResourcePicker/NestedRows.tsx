@@ -10,6 +10,7 @@ interface NestedRowsProps {
   requestNestedRows: (row: ResourceRow) => Promise<void>;
   onRowSelectedChange: (row: ResourceRow, selected: boolean) => void;
   selectableEntryTypes: ResourceRowType[];
+  scrollIntoView: boolean;
 }
 
 const NestedRows: React.FC<NestedRowsProps> = ({
@@ -19,17 +20,19 @@ const NestedRows: React.FC<NestedRowsProps> = ({
   requestNestedRows,
   onRowSelectedChange,
   selectableEntryTypes,
+  scrollIntoView,
 }) => (
   <>
     {rows.map((row) => (
       <NestedRow
-        key={row.id}
+        key={row.uri}
         row={row}
         selectedRows={selectedRows}
         level={level}
         requestNestedRows={requestNestedRows}
         onRowSelectedChange={onRowSelectedChange}
         selectableEntryTypes={selectableEntryTypes}
+        scrollIntoView={scrollIntoView}
       />
     ))}
   </>

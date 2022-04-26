@@ -16,6 +16,7 @@ interface NestedRowProps {
   requestNestedRows: (row: ResourceRow) => Promise<void>;
   onRowSelectedChange: (row: ResourceRow, selected: boolean) => void;
   selectableEntryTypes: ResourceRowType[];
+  scrollIntoView: boolean;
 }
 
 const NestedRow: React.FC<NestedRowProps> = ({
@@ -25,11 +26,12 @@ const NestedRow: React.FC<NestedRowProps> = ({
   requestNestedRows,
   onRowSelectedChange,
   selectableEntryTypes,
+  scrollIntoView,
 }) => {
   const styles = useStyles2(getStyles);
   const [rowStatus, setRowStatus] = useState<'open' | 'closed' | 'loading'>('closed');
 
-  const isSelected = !!selectedRows.find((v) => v.id === row.id);
+  const isSelected = !!selectedRows.find((v) => v.uri === row.uri);
   const isDisabled = selectedRows.length > 0 && !isSelected;
   const isOpen = rowStatus === 'open';
 
@@ -48,9 +50,7 @@ const NestedRow: React.FC<NestedRowProps> = ({
   useEffect(() => {
     // Assuming we don't have multi-select yet
     const selectedRow = selectedRows[0];
-
-    const containsChild = selectedRow && !!findRow(row.children ?? [], selectedRow.id);
-
+    const containsChild = selectedRow && !!findRow(row.children ?? [], selectedRow?.uri);
     if (containsChild) {
       setRowStatus('open');
     }
@@ -69,6 +69,7 @@ const NestedRow: React.FC<NestedRowProps> = ({
             onToggleCollapse={onRowToggleCollapse}
             onSelectedChange={onRowSelectedChange}
             isSelectable={selectableEntryTypes.some((type) => type === row.type)}
+            scrollIntoView={scrollIntoView}
           />
         </td>
 
@@ -85,6 +86,7 @@ const NestedRow: React.FC<NestedRowProps> = ({
           requestNestedRows={requestNestedRows}
           onRowSelectedChange={onRowSelectedChange}
           selectableEntryTypes={selectableEntryTypes}
+          scrollIntoView={scrollIntoView}
         />
       )}
 

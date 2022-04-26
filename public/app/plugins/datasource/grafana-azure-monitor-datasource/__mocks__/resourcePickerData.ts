@@ -1,12 +1,18 @@
-import ResourcePicker from '../resourcePicker/resourcePickerData';
+import ResourcePickerData from '../resourcePicker/resourcePickerData';
+
+import { createMockInstanceSetttings } from './instanceSettings';
 
 type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
-export default function createMockResourcePickerData(overrides?: DeepPartial<ResourcePicker>) {
-  const _mockResourcePicker: DeepPartial<ResourcePicker> = {
-    getSubscriptions: () => jest.fn().mockResolvedValue([]),
+export default function createMockResourcePickerData(overrides?: DeepPartial<ResourcePickerData>) {
+  const rpd = new ResourcePickerData(createMockInstanceSetttings());
+  const _mockResourcePicker: DeepPartial<ResourcePickerData> = {
+    fetchInitialRows: rpd.fetchInitialRows,
+    fetchNestedRowData: rpd.fetchNestedRowData,
+    search: jest.fn().mockResolvedValue([]),
+    getSubscriptions: jest.fn().mockResolvedValue([]),
     getResourceGroupsBySubscriptionId: jest.fn().mockResolvedValue([]),
     getResourcesForResourceGroup: jest.fn().mockResolvedValue([]),
     getResourceURIFromWorkspace: jest.fn().mockReturnValue(''),
@@ -14,7 +20,7 @@ export default function createMockResourcePickerData(overrides?: DeepPartial<Res
     ...overrides,
   };
 
-  const mockDatasource = _mockResourcePicker as ResourcePicker;
+  const mockDatasource = _mockResourcePicker as ResourcePickerData;
 
   return jest.mocked(mockDatasource, true);
 }
