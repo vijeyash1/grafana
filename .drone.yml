@@ -18,7 +18,6 @@ steps:
       from_secret: tf_google_credentials
     mount:
     - yarncache
-    - node_modules
     restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
@@ -144,7 +143,6 @@ steps:
       from_secret: tf_google_credentials
     mount:
     - yarncache
-    - node_modules
     restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
@@ -215,7 +213,6 @@ steps:
       from_secret: tf_google_credentials
     mount:
     - yarncache
-    - node_modules
     rebuild: "true"
   when:
     event: pull_request
@@ -498,7 +495,6 @@ steps:
       from_secret: tf_google_credentials
     mount:
     - yarncache
-    - node_modules
     restore: "true"
 - commands:
   - mkdir -p bin
@@ -631,6 +627,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: e9d4f85965031b48e9a0ffe1e8d6db3e53460d14261b8acd5de90719318d6ab2
+hmac: b7ded51725b3cb664659fc402beea60c8dcacd35118ea33605e826eb05bbc812
 
 ...
