@@ -612,7 +612,25 @@ get:
 kind: secret
 name: gcp_upload_artifacts_key
 ---
+get:
+  name: credentials.json
+  path: infra/data/ci/terraform/google
+kind: secret
+name: tf_google_credentials
+---
+get:
+  name: access-key
+  path: infra/data/ci/test-drone-caching
+kind: secret
+name: access_key
+---
+get:
+  name: secret
+  path: infra/data/ci/test-drone-caching
+kind: secret
+name: secret
+---
 kind: signature
-hmac: b0826a5c1b451baf899df9ff78286969420f7938b231a272f1f2a203430ab898
+hmac: 23f58a9458b067ffee9bd3efd33603b6c8e0a9da93cc6ebc86bef67df4d1dca1
 
 ...
