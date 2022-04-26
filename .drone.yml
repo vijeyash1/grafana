@@ -7,6 +7,20 @@ platform:
   os: linux
 services: []
 steps:
+- image: meltwater/drone-cache:v1.2.2
+  name: restore-cache
+  pull: always
+  settings:
+    backend: gcs
+    bucket: test-julien
+    cache_key: test123
+    json_key:
+      from_secret: tf_google_credentials
+    mount:
+    - yarncache
+    - node_modules
+    - .betterer.cache
+    restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
   image: alpine:3.15
@@ -77,6 +91,20 @@ platform:
   os: linux
 services: []
 steps:
+- image: meltwater/drone-cache:v1.2.2
+  name: restore-cache
+  pull: always
+  settings:
+    backend: gcs
+    bucket: test-julien
+    cache_key: test123
+    json_key:
+      from_secret: tf_google_credentials
+    mount:
+    - yarncache
+    - node_modules
+    - .betterer.cache
+    restore: "true"
 - commands:
   - echo $DRONE_RUNNER_NAME
   image: alpine:3.15
@@ -104,6 +132,7 @@ steps:
 - commands:
   - ./bin/grabpl build-frontend --jobs 8 --edition oss --build-id ${DRONE_BUILD_NUMBER}
   depends_on:
+  - restore-cache
   - gen-version
   - yarn-install
   environment:
@@ -114,6 +143,7 @@ steps:
 - commands:
   - ./bin/grabpl build-frontend-packages --jobs 8 --edition oss --build-id ${DRONE_BUILD_NUMBER}
   depends_on:
+  - restore-cache
   - gen-version
   - yarn-install
   environment:
@@ -287,6 +317,7 @@ steps:
 - commands:
   - ./bin/grabpl build-frontend-packages --jobs 8 --edition oss --build-id ${DRONE_BUILD_NUMBER}
   depends_on:
+  - restore-cache
   - gen-version
   - yarn-install
   environment:
@@ -369,6 +400,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: 9b16ff12b51aca3919e5abf7b327c37535a8489c1c3e0d4444f4003e525f211e
+hmac: 95b82636f419c64b582b6f74b779b7ce8bb989d9711cba92479f5b4a5818180a
 
 ...

@@ -66,7 +66,7 @@ def pr_pipelines(edition):
     variants = ['linux-amd64', 'linux-amd64-musl', 'darwin-amd64', 'windows-amd64', 'armv6',]
     include_enterprise2 = edition == 'enterprise'
     init_steps = [
-        # restore_cache_step(),
+        restore_cache_step(),
         identify_runner_step(),
         download_grabpl_step(),
         gen_version_step(ver_mode),
