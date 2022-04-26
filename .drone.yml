@@ -204,6 +204,8 @@ steps:
   image: grafana/build-container:1.5.4
   name: build-frontend-packages
 - depends_on:
+  - build-frontend
+  - build-frontend-packages
   - yarn-install
   image: meltwater/drone-cache:v1.2.2
   name: rebuild-cache
@@ -631,6 +633,6 @@ kind: secret
 name: secret
 ---
 kind: signature
-hmac: e669c9cdb873c7e64ce8f5fe675ba033ad8ee347d6ced9d6ab4cafbec1e8cbe1
+hmac: 2a327c4e1d57882c4b48df8f1349eb59de18f041380db4adb6e065d8f4e1f403
 
 ...
