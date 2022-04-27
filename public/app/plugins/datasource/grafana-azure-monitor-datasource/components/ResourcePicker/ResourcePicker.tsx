@@ -10,7 +10,7 @@ import { Space } from '../Space';
 import NestedRow from './NestedRow';
 import getStyles from './styles';
 import { ResourceRow, ResourceRowGroup, ResourceRowType } from './types';
-import { addResources, findRow } from './utils';
+import { findRow } from './utils';
 
 interface ResourcePickerProps {
   resourcePickerData: ResourcePickerData;
@@ -76,24 +76,18 @@ const ResourcePicker = ({
 
   // Request resources for a expanded resource group
   const requestNestedRows = useCallback(
-    async (resourceGroupOrSubscription: ResourceRow) => {
+    async (parentRow: ResourceRow) => {
       // clear error message (also when loading cached resources)
       setErrorMessage(undefined);
 
       // If we already have children, we don't need to re-fetch them.
-      if (resourceGroupOrSubscription.children?.length) {
+      if (parentRow.children?.length) {
         return;
       }
 
       try {
-        const nestedRows =
-          resourceGroupOrSubscription.type === ResourceRowType.Subscription
-            ? await resourcePickerData.getResourceGroupsBySubscriptionId(resourceGroupOrSubscription.id)
-            : await resourcePickerData.getResourcesForResourceGroup(resourceGroupOrSubscription.id);
-
-        const newRows = addResources(rows, resourceGroupOrSubscription.uri, nestedRows);
-
-        setRows(newRows);
+        const nestedRows = await resourcePickerData.fetchNestedRowData(parentRow, rows);
+        setRows(nestedRows);
       } catch (error) {
         setErrorMessage(messageFromError(error));
         throw error;

@@ -7,7 +7,7 @@ import {
   logsSupportedResourceTypesKusto,
   resourceTypeDisplayNames,
 } from '../azureMetadata';
-import { ResourceRowGroup, ResourceRowType } from '../components/ResourcePicker/types';
+import { ResourceRow, ResourceRowGroup, ResourceRowType } from '../components/ResourcePicker/types';
 import { addResources, parseResourceURI } from '../components/ResourcePicker/utils';
 import {
   AzureDataSourceJsonData,
@@ -55,6 +55,16 @@ export default class ResourcePickerData extends DataSourceWithBackend<AzureMonit
     return resources;
   }
 
+  async fetchNestedRowData(parentRow: ResourceRow, existingRows: ResourceRowGroup): Promise<ResourceRowGroup> {
+    const nestedRows =
+      parentRow.type === ResourceRowType.Subscription
+        ? await this.getResourceGroupsBySubscriptionId(parentRow.id)
+        : await this.getResourcesForResourceGroup(parentRow.id);
+
+    return addResources(existingRows, parentRow.uri, nestedRows);
+  }
+
+  // private
   async getSubscriptions(): Promise<ResourceRowGroup> {
     const query = `
     resources
