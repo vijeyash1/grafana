@@ -10,7 +10,7 @@ import { Space } from '../Space';
 import NestedRow from './NestedRow';
 import getStyles from './styles';
 import { ResourceRow, ResourceRowGroup, ResourceRowType } from './types';
-import { addResources, findRow, parseResourceURI } from './utils';
+import { addResources, findRow } from './utils';
 
 interface ResourcePickerProps {
   resourcePickerData: ResourcePickerData;
@@ -47,31 +47,7 @@ const ResourcePicker = ({
       const loadInitialData = async () => {
         try {
           setLoadingStatus('Started');
-          let resources = await resourcePickerData.getSubscriptions();
-          if (!internalSelectedURI) {
-            setAzureRows(resources);
-            setLoadingStatus('Done');
-            return;
-          }
-
-          const parsedURI = parseResourceURI(internalSelectedURI ?? '');
-          if (parsedURI) {
-            const resourceGroupURI = `/subscriptions/${parsedURI.subscriptionID}/resourceGroups/${parsedURI.resourceGroup}`;
-
-            // if a resource group was previously selected, but the resource groups under the parent subscription have not been loaded yet
-            if (parsedURI.resourceGroup && !findRow(resources, resourceGroupURI)) {
-              const resourceGroups = await resourcePickerData.getResourceGroupsBySubscriptionId(
-                parsedURI.subscriptionID
-              );
-              resources = addResources(resources, `/subscriptions/${parsedURI.subscriptionID}`, resourceGroups);
-            }
-
-            // if a resource was previously selected, but the resources under the parent resource group have not been loaded yet
-            if (parsedURI.resource && !findRow(azureRows, parsedURI.resource ?? '')) {
-              const resourcesForResourceGroup = await resourcePickerData.getResourcesForResourceGroup(resourceGroupURI);
-              resources = addResources(resources, resourceGroupURI, resourcesForResourceGroup);
-            }
-          }
+          const resources = await resourcePickerData.fetchInitialRows(internalSelectedURI || '');
           setAzureRows(resources);
           setLoadingStatus('Done');
         } catch (error) {
