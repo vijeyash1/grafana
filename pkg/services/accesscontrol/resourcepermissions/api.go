@@ -56,7 +56,6 @@ func (a *api) getEvaluators(actionRead, actionWrite, scope string) (read, write 
 
 func (a *api) registerEndpoints() {
 	auth := middleware.Middleware(a.ac)
-	uidSolver := solveUID(a.service.options.UidSolver)
 	inheritanceSolver := solveInheritedScopes(a.service.options.InheritedScopesSolver)
 	disable := middleware.Disable(a.ac.IsDisabled())
 	a.router.Group(fmt.Sprintf("/api/access-control/%s", a.service.options.Resource), func(r routing.RouteRegister) {
@@ -65,10 +64,10 @@ func (a *api) registerEndpoints() {
 		scope := accesscontrol.Scope(a.service.options.Resource, a.service.options.ResourceAttribute, accesscontrol.Parameter(":resourceID"))
 		readEvaluator, writeEvaluator := a.getEvaluators(actionRead, actionWrite, scope)
 		r.Get("/description", auth(disable, accesscontrol.EvalPermission(actionRead)), routing.Wrap(a.getDescription))
-		r.Get("/:resourceID", inheritanceSolver, uidSolver, auth(disable, readEvaluator), routing.Wrap(a.getPermissions))
-		r.Post("/:resourceID/users/:userID", inheritanceSolver, uidSolver, auth(disable, writeEvaluator), routing.Wrap(a.setUserPermission))
-		r.Post("/:resourceID/teams/:teamID", inheritanceSolver, uidSolver, auth(disable, writeEvaluator), routing.Wrap(a.setTeamPermission))
-		r.Post("/:resourceID/builtInRoles/:builtInRole", inheritanceSolver, uidSolver, auth(disable, writeEvaluator), routing.Wrap(a.setBuiltinRolePermission))
+		r.Get("/:resourceID", inheritanceSolver, auth(disable, readEvaluator), routing.Wrap(a.getPermissions))
+		r.Post("/:resourceID/users/:userID", inheritanceSolver, auth(disable, writeEvaluator), routing.Wrap(a.setUserPermission))
+		r.Post("/:resourceID/teams/:teamID", inheritanceSolver, auth(disable, writeEvaluator), routing.Wrap(a.setTeamPermission))
+		r.Post("/:resourceID/builtInRoles/:builtInRole", inheritanceSolver, auth(disable, writeEvaluator), routing.Wrap(a.setBuiltinRolePermission))
 	})
 }
 
