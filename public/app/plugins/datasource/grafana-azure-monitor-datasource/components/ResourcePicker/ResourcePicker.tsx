@@ -32,7 +32,7 @@ const ResourcePicker = ({
 
   type LoadingStatus = 'NotStarted' | 'Started' | 'Done';
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatus>('NotStarted');
-  const [azureRows, setAzureRows] = useState<ResourceRowGroup>([]);
+  const [rows, setRows] = useState<ResourceRowGroup>([]);
   const [internalSelectedURI, setInternalSelectedURI] = useState<string | undefined>(resourceURI);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(resourceURI?.includes('$'));
@@ -48,7 +48,7 @@ const ResourcePicker = ({
         try {
           setLoadingStatus('Started');
           const resources = await resourcePickerData.fetchInitialRows(internalSelectedURI || '');
-          setAzureRows(resources);
+          setRows(resources);
           setLoadingStatus('Done');
         } catch (error) {
           setLoadingStatus('Done');
@@ -58,11 +58,11 @@ const ResourcePicker = ({
 
       loadInitialData();
     }
-  }, [resourcePickerData, internalSelectedURI, azureRows, loadingStatus]);
+  }, [resourcePickerData, internalSelectedURI, rows, loadingStatus]);
 
   // Map the selected item into an array of rows
   const selectedResourceRows = useMemo(() => {
-    const found = internalSelectedURI && findRow(azureRows, internalSelectedURI);
+    const found = internalSelectedURI && findRow(rows, internalSelectedURI);
 
     return found
       ? [
@@ -72,7 +72,7 @@ const ResourcePicker = ({
           },
         ]
       : [];
-  }, [internalSelectedURI, azureRows]);
+  }, [internalSelectedURI, rows]);
 
   // Request resources for a expanded resource group
   const requestNestedRows = useCallback(
@@ -86,20 +86,20 @@ const ResourcePicker = ({
       }
 
       try {
-        const rows =
+        const nestedRows =
           resourceGroupOrSubscription.type === ResourceRowType.Subscription
             ? await resourcePickerData.getResourceGroupsBySubscriptionId(resourceGroupOrSubscription.id)
             : await resourcePickerData.getResourcesForResourceGroup(resourceGroupOrSubscription.id);
 
-        const newRows = addResources(azureRows, resourceGroupOrSubscription.uri, rows);
+        const newRows = addResources(rows, resourceGroupOrSubscription.uri, nestedRows);
 
-        setAzureRows(newRows);
+        setRows(newRows);
       } catch (error) {
         setErrorMessage(messageFromError(error));
         throw error;
       }
     },
-    [resourcePickerData, azureRows]
+    [resourcePickerData, rows]
   );
 
   const handleSelectionChanged = useCallback((row: ResourceRow, isSelected: boolean) => {
@@ -131,7 +131,7 @@ const ResourcePicker = ({
           <div className={styles.tableScroller}>
             <table className={styles.table}>
               <tbody>
-                {azureRows.map((row) => (
+                {rows.map((row) => (
                   <NestedRow
                     key={row.uri}
                     row={row}
