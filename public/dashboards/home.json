@@ -3,19 +3,6 @@
   "panels": [
     {
       "datasource": null,
-      "gridPos": {
-        "h": 3,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 1,
-      "title": "",
-      "transparent": false,
-      "type": "welcome"
-    },
-    {
-      "datasource": null,
       "folderId": 0,
       "gridPos": {
         "h": 15,

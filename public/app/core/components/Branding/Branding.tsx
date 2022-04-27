@@ -10,7 +10,13 @@ export interface BrandComponentProps {
 }
 
 const LoginLogo: FC<BrandComponentProps> = ({ className }) => {
-  return <img className={className} src="public/img/grafana_icon.svg" alt="Grafana" />;
+  return (
+    <img
+      className={className}
+      src="https://cdn-icons.flaticon.com/png/512/5680/premium/5680565.png?token=exp=1651057403~hmac=abbd4d5adf25bdeafcbc246238887e74"
+      alt="Grafana"
+    />
+  );
 };
 
 const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
@@ -43,7 +49,13 @@ const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
 };
 
 const MenuLogo: FC<BrandComponentProps> = ({ className }) => {
-  return <img className={className} src="public/img/grafana_icon.svg" alt="Grafana" />;
+  return (
+    <img
+      className={className}
+      src="https://cdn-icons.flaticon.com/png/512/5680/premium/5680565.png?token=exp=1651057403~hmac=abbd4d5adf25bdeafcbc246238887e74"
+      alt="Grafana"
+    />
+  );
 };
 
 const LoginBoxBackground = () => {
@@ -59,8 +71,8 @@ export class Branding {
   static LoginBackground = LoginBackground;
   static MenuLogo = MenuLogo;
   static LoginBoxBackground = LoginBoxBackground;
-  static AppTitle = 'Grafana';
-  static LoginTitle = 'Welcome to Grafana';
+  static AppTitle = 'Soi Devops';
+  static LoginTitle = 'Welcome to Soi Devops';
   static GetLoginSubTitle = (): null | string => {
     return null;
   };
