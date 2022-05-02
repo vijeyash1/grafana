@@ -10,13 +10,7 @@ export interface BrandComponentProps {
 }
 
 const LoginLogo: FC<BrandComponentProps> = ({ className }) => {
-  return (
-    <img
-      className={className}
-      src="https://cdn-icons.flaticon.com/png/512/5680/premium/5680565.png?token=exp=1651057403~hmac=abbd4d5adf25bdeafcbc246238887e74"
-      alt="Grafana"
-    />
-  );
+  return <img className={className} src="https://cdn-icons-png.flaticon.com/512/5110/5110577.png" alt="SOI" />;
 };
 
 const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
@@ -49,13 +43,7 @@ const LoginBackground: FC<BrandComponentProps> = ({ className, children }) => {
 };
 
 const MenuLogo: FC<BrandComponentProps> = ({ className }) => {
-  return (
-    <img
-      className={className}
-      src="https://cdn-icons.flaticon.com/png/512/5680/premium/5680565.png?token=exp=1651057403~hmac=abbd4d5adf25bdeafcbc246238887e74"
-      alt="Grafana"
-    />
-  );
+  return <img className={className} src="https://cdn-icons-png.flaticon.com/512/5110/5110577.png" alt="SOI" />;
 };
 
 const LoginBoxBackground = () => {
